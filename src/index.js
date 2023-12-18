@@ -73,7 +73,6 @@ const getInfo = async (url) => {
 
 
     const images = filterImage(result.all);
-
     await browser.close();
 
     removeHref(result.meta);
@@ -82,7 +81,7 @@ const getInfo = async (url) => {
     return {
         title: result.title,
         body: result.body,
-        images,
+        images : JSON.stringify(images),
         meta: result.meta,
         all: result.all,
     }
