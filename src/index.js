@@ -1,5 +1,4 @@
-const axios = require('axios')
-const cheerio = require('cheerio')
+
 const {isValidHttpUrl, makeValidUrl, isHttpUrl} = require("./isValidUrl");
 const puppeteer = require('puppeteer');
 const isImageUrl = require('./isImageUrl')
@@ -12,13 +11,14 @@ const load = async (url) => {
 
     url = makeValidUrl(url)
 
-    const result = loadPuppeteer(url);
+    const result = getInfo(url);
 
     return result;
 }
 
 const getInfo = async (url) => {
     const browser = await puppeteer.launch({
+        executablePath: process.env.CHROME_BIN || null,
         headless: "new", args: ['--no-sandbox', '--disable-setuid-sandbox',],
     });
 
