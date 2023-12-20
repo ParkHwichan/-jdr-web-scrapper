@@ -2,6 +2,14 @@ const {isHttpUrl} = require("./isValidUrl");
 
 const isImageUrl = (url) => {
     // HTTP 또는 HTTPS URL인지 확인
+    if(typeof url !== 'string') {
+        return false;
+    }
+
+    if(url.startsWith('//')) {
+        url = 'https:' + url;
+    }
+
     if (!isHttpUrl(url)) {
         return false;
     }
