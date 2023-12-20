@@ -2,6 +2,7 @@
 const {isValidHttpUrl, makeValidUrl, isHttpUrl} = require("./isValidUrl");
 const puppeteer = require('puppeteer');
 const isImageUrl = require('./isImageUrl')
+const extractDomain = require("./extractDomain");
 
 const load = async (url) => {
 
@@ -26,6 +27,8 @@ const getInfo = async (url) => {
     await page.goto(url, {waitUntil: 'networkidle0'}); // 네트워크 활동이 멈출 때까지 기다립니다.
 
 
+    const domain = extractDomain(url);
+    console.log("Domain: " + domain);
     const result = await page.evaluate(() => {
 
             const title = document.title;
@@ -72,7 +75,7 @@ const getInfo = async (url) => {
     );
 
 
-    const images = filterImage(result.all);
+    const images = filterImage(result.all, domain);
     await browser.close();
 
     removeHref(result.meta);
@@ -88,14 +91,36 @@ const getInfo = async (url) => {
 }
 
 
-const filterImage = (elements) => {
+const filterImage = (elements, domain) => {
 
     const filtered = [];
 
     elements.forEach(element => {
             for (let key in element) {
-                if (isImageUrl(element[key])) {
-                    filtered.push(element);
+
+
+                let cloneElement = {...element};
+
+                let convertedUrl = cloneElement[key];
+                if(typeof convertedUrl !== 'string') {
+                    continue;
+                }
+
+                if(convertedUrl.startsWith('//')) {
+                    convertedUrl= 'https:' + convertedUrl;
+                }
+
+                if(convertedUrl.startsWith('/')) {
+                    convertedUrl= 'https://' + domain + convertedUrl;
+                }
+
+                if (!isHttpUrl(convertedUrl)) {
+                    continue;
+                }
+
+                if (isImageUrl(convertedUrl)) {
+                    cloneElement[key] = convertedUrl;
+                    filtered.push(cloneElement);
                 }
             }
         }

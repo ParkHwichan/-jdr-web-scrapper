@@ -26,7 +26,7 @@ rl.question('Please provide a url to scrap: ', (answer) => {
 
     (async () => {
         const result = await load(answer);
-        console.log(result);
+        console.log(result.images);
     })();
 
 
